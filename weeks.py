@@ -10,6 +10,8 @@ Created on Sun Jun 25 07:28:59 2017
 import math
 import cairo
 import datetime
+import yaml
+import sys
 
 
 if not cairo.HAS_PDF_SURFACE:
@@ -20,27 +22,25 @@ def dow(y,m,d):
 def daysbetween(a,b):
     return (datetime.date(a[0],a[1],a[2])-datetime.date(b[0],b[1],b[2])).days
 
-def draw_func(ctx,w,h):
+def draw_func(ctx,w,h,params):
     
     aspect=float(h)/w
 
-    ctx.scale (min(w,h),min(w,h)) # Normalizing the canvas
-
-#    pat = cairo.LinearGradient (0.0, 0.0, 0.0, 1.0)
-#    pat.add_color_stop_rgba (1, 0.7, 0, 0, 0.5) # First stop, 50% opacity
-#    pat.add_color_stop_rgba (0, 0.9, 0.7, 0.2, 1) # Last stop, 100% opacity
-#
-#    ctx.rectangle (0, 0, 1, 1) # Rectangle(x0, y0, x1, y1)
-#    ctx.set_source (pat)
-#    ctx.fill ()
+    ctx.scale (min(w,h),min(w,h)) 
     margin=0.05
-    top=margin
+    if parameters["Title"]:
+        top=margin*2
+    else:
+        top=margin
     bottom=aspect-margin
     grid=(0.05+margin,1.0-margin)
-    startyear=1973
+    startyear=parameters["StartDate"][0]
     verticalgap=0.003
+    
+    fontsize_year=0.01
+    fontsize_title=0.025
 
-    nbrows=90
+    nbrows=parameters["NumberOfYears"]
     
     spans=[[(1973,1,1),(1973,2,20), (0.5,0.5,0.5)],
            [(1979,9,1),(1985,7,1),  (0.4,0.8,0.4)],
@@ -50,7 +50,17 @@ def draw_func(ctx,w,h):
 
     cr.select_font_face("Sans", cairo.FONT_SLANT_NORMAL,
                         cairo.FONT_WEIGHT_BOLD)
-    cr.set_font_size(0.01)
+                        
+    if parameters["Title"]:
+        cr.set_font_size(fontsize_title)
+        ext=cr.text_extents(parameters["Title"])
+        print ext
+        ctx.move_to (0.5-ext[2]/2.,margin+margin/2. +ext[3]/2.)
+        ctx.show_text(parameters["Title"])
+        
+    cr.set_font_size(fontsize_year)
+    
+    
 
     def faded():
         ctx.set_source_rgb (0.5, 0.5, 0.5) # Solid color
@@ -181,20 +191,23 @@ def draw_func(ctx,w,h):
     #ctx.set_line_width (0.02)
 
 
-
-
-width_in_inches, height_in_inches = 8.5, 11
-width_in_points, height_in_points = \
-        width_in_inches * 72, height_in_inches * 72
-width, height = width_in_points, height_in_points
-
-surface = cairo.PDFSurface("weeks.pdf",width,height)
-cr = cairo.Context (surface)
-cr.save()
-draw_func(cr, width, height)
-cr.restore()
-cr.show_page()
-surface.finish()
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print "Usage: LifeAsWeeks config.yml output.pdf"
+    else:
+        parameters=yaml.load(open(sys.argv[1]))
+        
+        width_in_inches, height_in_inches = parameters["PaperSizeInInches"]
+        width_in_points, height_in_points = width_in_inches * 72, height_in_inches * 72
+        width, height = width_in_points, height_in_points
+    
+        surface = cairo.PDFSurface(sys.argv[2],width,height)
+        cr = cairo.Context (surface)
+        cr.save()
+        draw_func(cr, width, height, parameters)
+        cr.restore()
+        cr.show_page()
+        surface.finish()
 
 
 
