@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jun 25 07:28:59 2017
-
-@author: rupert
+Generate a diagram showing weeks of each year, for all the years in a range.
+Inspired by  https://waitbutwhy.com/2014/05/life-weeks.html
 """
 
 #!/usr/bin/env python
@@ -54,7 +53,7 @@ def draw_func(ctx,w,h,params):
     if parameters["Title"]:
         cr.set_font_size(fontsize_title)
         ext=cr.text_extents(parameters["Title"])
-        print ext
+        print (ext)
         ctx.move_to (0.5-ext[2]/2.,margin+margin/2. +ext[3]/2.)
         ctx.show_text(parameters["Title"])
         
@@ -108,8 +107,8 @@ def draw_func(ctx,w,h,params):
         for s in spans:
             dayspan=getdayspan(year,s)
             if not dayspan is None:
-                print "Setting",s,"for year",year
-                print dayspan
+                print ("Setting",s,"for year",year)
+                print (dayspan)
                 h0=rowtop(y) #top+(y-1)*(bottom-top)/nbrows
                 h1=rowbottom(y) #top+y*(bottom-top)/nbrows
                 x0=xpos(startdow+dayspan[0])
@@ -193,9 +192,9 @@ def draw_func(ctx,w,h,params):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print "Usage: LifeAsWeeks config.yml output.pdf"
+        print ("Usage: LifeAsWeeks config.yml output.pdf")
     else:
-        parameters=yaml.load(open(sys.argv[1]))
+        parameters=yaml.load(open(sys.argv[1]), Loader=yaml.SafeLoader)
         
         width_in_inches, height_in_inches = parameters["PaperSizeInInches"]
         width_in_points, height_in_points = width_in_inches * 72, height_in_inches * 72
