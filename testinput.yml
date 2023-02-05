@@ -1,0 +1,22 @@
+#
+# Input file for Life as weeks
+#  YAML format
+# 
+Title:         Winston Churchill's Life
+StartDate:     [1874, 11, 30] 
+NumberOfYears: 91
+# Starting Day
+# Obvious starting days are
+# Jan 1 - the first of the year
+# the anniversary of the start date
+# but any starting day is possible.
+# Specified numerically as [month,day]
+StartingDay: [01,01]
+# Mode
+# Week boundaries and days of year do not line up
+# The dominant one stays fixed on the page and the other 
+# adjusts against it.
+# Allowable modes: "WeekDominant","CalendarDominant"
+Mode: CalendarDominant
+PaperSizeInInches: [ 8.5, 11]
+
